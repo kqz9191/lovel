@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для тебя ❤️</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="animation-container">
+        <!-- Персонаж в формате SVG -->
+        <svg id="character" preserveAspectRatio="xMidYMid meet" viewBox="0 0 100 120">
+            <!-- Голова -->
+            <path id="head" d="M 20 45 A 25 25 0 1 1 70 45 A 25 25 0 1 1 20 45" />
+            <!-- Тело -->
+            <path id="body" d="M 45 70 L 45 100" />
+            <!-- Ноги -->
+            <path id="leg1" d="M 45 100 L 30 115" />
+            <path id="leg2" d="M 45 100 L 60 115" />
+            <!-- Рука -->
+            <path id="arm" d="M 45 75 L 75 60" />
+            <!-- Пальцы -->
+            <path id="fingers" d="M 75 60 L 70 55 M 75 60 L 80 58 M 75 60 L 78 65" />
+            
+            <!-- Элементы лица -->
+            <circle class="face-feature eye" cx="35" cy="45" r="2" />
+            <circle class="face-feature eye" cx="55" cy="45" r="2" />
+            <path class="face-feature blush" d="M 25 50 C 30 55, 35 55, 40 50" />
+            <path class="face-feature blush" d="M 65 50 C 60 55, 55 55, 50 50" />
+        </svg>
+
+        <div id="biu-text" class="text">biu</div>
+        <div id="hearts-container"></div>
+        <div id="love-text" class="text">I Love You</div>
+
+        <div id="start-overlay">
+            <button id="start-button">Нажми сюда</button>
+        </div>
+    </div>
+    
+    <audio id="background-audio" loop>
+        <source src="background-music.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
