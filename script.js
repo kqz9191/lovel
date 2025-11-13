@@ -1,125 +1,97 @@
-/* Общие стили */
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #1a1a1a; /* Сделаем фон темнее для контраста */
-    font-family: 'Comic Sans MS', cursive, sans-serif;
-}
+document.addEventListener('DOMContentLoaded', () => {
+    const startButton = document.getElementById('start-button');
+    const startOverlay = document.getElementById('start-overlay');
+    const character = document.getElementById('character');
+    const biuText = document.getElementById('biu-text');
+    const loveText = document.getElementById('love-text');
+    const heartsContainer = document.getElementById('hearts-container');
+    const audio = document.getElementById('background-audio');
+    const animationContainer = document.getElementById('animation-container');
 
-#animation-container {
-    position: relative;
-    /* Адаптивные размеры: занимает 95% ширины экрана, но не больше 600px */
-    width: 95vw;
-    max-width: 600px;
-    /* Сохраняем пропорции 3:2 */
-    aspect-ratio: 3 / 2;
-    background-color: #fff;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(255, 105, 180, 0.3);
-    overflow: hidden;
-}
+    // Координаты для сердечек в виде % от ширины/высоты контейнера.
+    // Это делает их положение адаптивным для любого экрана.
+    const heartRatios = [
+        // Верхняя часть сердца
+        { x: 0.60, y: 0.18 }, { x: 0.52, y: 0.15 }, { x: 0.68, y: 0.15 },
+        { x: 0.46, y: 0.20 }, { x: 0.74, y: 0.20 }, { x: 0.42, y: 0.28 },
+        { x: 0.78, y: 0.28 }, { x: 0.40, y: 0.38 }, { x: 0.80, y: 0.38 },
+        
+        // Средняя часть
+        { x: 0.60, y: 0.25 }, { x: 0.52, y: 0.22 }, { x: 0.68, y: 0.22 },
+        { x: 0.48, y: 0.30 }, { x: 0.72, y: 0.30 }, { x: 0.45, y: 0.40 },
+        { x: 0.75, y: 0.40 }, { x: 0.44, y: 0.50 }, { x: 0.76, y: 0.50 },
+        
+        // Нижняя часть
+        { x: 0.48, y: 0.60 }, { x: 0.72, y: 0.60 }, { x: 0.53, y: 0.70 },
+        { x: 0.67, y: 0.70 }, { x: 0.58, y: 0.80 }, { x: 0.62, y: 0.80 },
+        { x: 0.60, y: 0.88 }
+    ];
 
-/* Стили для SVG-персонажа (адаптивные) */
-#character {
-    position: absolute;
-    bottom: 5%;
-    left: 8%;
-    width: 25%; /* Размер персонажа зависит от размера контейнера */
-    height: auto;
-}
+    // Добавим больше точек для плотности
+    const denseHeartRatios = [...heartRatios];
+    heartRatios.forEach(p => {
+        denseHeartRatios.push({x: p.x + 0.01, y: p.y + 0.01});
+        denseHeartRatios.push({x: p.x - 0.01, y: p.y - 0.01});
+    });
 
-#character path {
-    fill: none;
-    stroke: #000;
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-dasharray: 1000;
-    stroke-dashoffset: 1000;
-}
 
-/* ЗАМЕДЛЕННАЯ анимация рисования */
-@keyframes draw {
-    to { stroke-dashoffset: 0; }
-}
+    function startAnimation() {
+        // 1. Скрываем кнопку и запускаем музыку
+        startOverlay.style.opacity = '0';
+        setTimeout(() => startOverlay.style.display = 'none', 500);
+        audio.play();
 
-/* Применяем замедленную анимацию */
-.drawing #head { animation: draw 2s forwards; }
-.drawing #body { animation: draw 1s 1.8s forwards; }
-.drawing #leg1 { animation: draw 0.6s 2.5s forwards; }
-.drawing #leg2 { animation: draw 0.6s 2.5s forwards; }
-.drawing #arm { animation: draw 1s 2.8s forwards; }
-.drawing #fingers { animation: draw 1s 3.5s forwards; }
+        // 2. Начинаем рисовать персонажа
+        character.classList.add('drawing');
 
-/* Элементы лица появляются позже */
-.face-feature { opacity: 0; transition: opacity 1s; }
-.drawing .face-feature {
-    transition-delay: 4s; /* Появляются после отрисовки */
-    opacity: 1;
-}
-.eye { fill: #000; }
-.blush { stroke: #ff9999; stroke-width: 2; fill: none; }
+        // 3. (ЗАМЕДЛЕНО) Показываем "biu" после отрисовки
+        setTimeout(() => {
+            biuText.style.opacity = '1';
+        }, 4500);
 
-/* Стили для сердечек (адаптивный размер) */
-.heart {
-    position: absolute;
-    color: #ff477e;
-    /* Размер шрифта сердечка зависит от ширины экрана */
-    font-size: clamp(12px, 3vw, 22px);
-    opacity: 0;
-    transform: scale(0);
-    /* Анимация полета стала медленнее */
-    transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 1s;
-}
+        // 4. (ЗАМЕДЛЕНО) Начинаем создавать сердечки
+        setTimeout(() => {
+            const containerRect = animationContainer.getBoundingClientRect();
+            
+            // Начальная позиция "вылета" сердечка (у рта/руки) в %
+            const startXRatio = 0.28;
+            const startYRatio = 0.65;
+            
+            denseHeartRatios.forEach((ratio, index) => {
+                // Задержка между появлением каждого сердечка увеличена
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart');
+                    heart.innerHTML = '♥';
+                    
+                    // Рассчитываем начальные и конечные координаты в пикселях
+                    const startX = containerRect.width * startXRatio;
+                    const startY = containerRect.height * startYRatio;
+                    const targetX = containerRect.width * ratio.x;
+                    const targetY = containerRect.height * ratio.y;
 
-/* Стили для текста (адаптивные) */
-.text {
-    position: absolute;
-    opacity: 0;
-    /* Плавное появление */
-    transition: opacity 2s ease-in-out;
-}
+                    // Устанавливаем начальное положение
+                    heart.style.left = `${startX}px`;
+                    heart.style.top = `${startY}px`;
+                    
+                    heartsContainer.appendChild(heart);
+                    
+                    // Запускаем анимацию полета
+                    requestAnimationFrame(() => {
+                        const translateX = targetX - startX;
+                        const translateY = targetY - startY;
+                        heart.style.opacity = '1';
+                        heart.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`;
+                    });
+                }, index * 80); // Увеличенная задержка
+            });
+        }, 5000);
+        
+        // 5. (ЗАМЕДЛЕНО) Показываем финальный текст, когда все сердечки на месте
+        setTimeout(() => {
+            loveText.style.opacity = '1';
+        }, 10000); // Появляется значительно позже
+    }
 
-#biu-text {
-    /* Позиционируем относительно персонажа */
-    left: 28%;
-    bottom: 28%;
-    font-size: clamp(16px, 4vw, 24px);
-    color: #555;
-    transform: rotate(-15deg);
-}
-
-#love-text {
-    bottom: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: clamp(28px, 10vw, 50px);
-    color: #e83e8c;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-}
-
-/* Кнопка запуска */
-#start-overlay {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(255, 255, 255, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-    transition: opacity 0.5s;
-}
-#start-button {
-    padding: 15px 30px;
-    font-size: clamp(18px, 5vw, 22px);
-    border: none;
-    background-color: #ff477e;
-    color: white;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
+    startButton.addEventListener('click', startAnimation);
+});
